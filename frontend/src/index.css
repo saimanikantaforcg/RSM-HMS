@@ -1,0 +1,431 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ═══════════════════════════════════════════════════════════════════
+   RSM HMS — GLOBAL DESIGN SYSTEM
+   Phase 8: Premium UI/UX Transformation
+   Inspired by Stripe · Notion · Linear · Apple Health
+════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  :root {
+    /* ── Brand / Teal Palette ───────────────────────────────────── */
+    --brand-50:  #f0fdfa;
+    --brand-100: #ccfbf1;
+    --brand-200: #99f6e4;
+    --brand-300: #5eead4;
+    --brand-400: #2dd4bf;
+    --brand-500: #14b8a6;
+    --brand-600: #0d9488;
+    --brand-700: #0f766e;
+    --brand-800: #115e59;
+    --brand-900: #134e4a;
+
+    /* ── Layout Surfaces ────────────────────────────────────────── */
+    --bg:      #f8fafc;
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --surface-3: #f1f5f9;
+
+    /* ── Borders ────────────────────────────────────────────────── */
+    --border: #e2e8f0;
+    --border-soft: rgba(226, 232, 240, 0.6);
+
+    /* ── Shadows ────────────────────────────────────────────────── */
+    --shadow-xs:   0 1px 2px rgba(0,0,0,0.04);
+    --shadow-soft: 0 2px 8px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03);
+    --shadow-card: 0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    --shadow-lg:   0 8px 30px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+    --shadow-hover: 0 12px 28px rgba(13,148,136,0.12), 0 4px 10px rgba(13,148,136,0.08);
+    --shadow-brand: 0 4px 14px rgba(13,148,136,0.25);
+
+    /* ── Legacy aliases (backward compat) ───────────────────────── */
+    --clinical-primary:   #0d9488;
+    --clinical-secondary: #0891b2;
+    --clinical-bg:        #f8fafc;
+    --clinical-surface:   #ffffff;
+    --glass-bg:   rgba(255,255,255,0.7);
+    --glass-border: rgba(255,255,255,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html {
+    font-size: 14px;
+    -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .premium-text {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.01em;
+  }
+
+  /* Premium Scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMPONENT LIBRARY
+═══════════════════════════════════════════════════════════ */
+@layer components {
+
+  /* ── Brand Color Utilities ─────────────────────────────── */
+  .text-brand-50  { color: var(--brand-50); }
+  .text-brand-100 { color: var(--brand-100); }
+  .text-brand-300 { color: var(--brand-300); }
+  .text-brand-400 { color: var(--brand-400); }
+  .text-brand-500 { color: var(--brand-500); }
+  .text-brand-600 { color: var(--brand-600); }
+  .text-brand-700 { color: var(--brand-700); }
+
+  .bg-brand-50  { background-color: var(--brand-50); }
+  .bg-brand-100 { background-color: var(--brand-100); }
+  .bg-brand-200 { background-color: var(--brand-200); }
+  .bg-brand-400 { background-color: var(--brand-400); }
+  .bg-brand-500 { background-color: var(--brand-500); }
+  .bg-brand-600 { background-color: var(--brand-600); }
+  .bg-brand-700 { background-color: var(--brand-700); }
+
+  .border-brand-200 { border-color: var(--brand-200); }
+  .border-brand-300 { border-color: var(--brand-300); }
+  .border-brand-500 { border-color: var(--brand-500); }
+
+  .ring-brand-500 { --tw-ring-color: var(--brand-500); }
+
+  /* ── Cards ─────────────────────────────────────────────── */
+  .clinical-card {
+    @apply bg-white border border-slate-200/60 rounded-xl transition-all duration-200;
+    box-shadow: var(--shadow-soft);
+  }
+  .clinical-card:hover {
+    @apply border-teal-200/60;
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-1px);
+  }
+
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-hover { box-shadow: var(--shadow-hover) !important; }
+
+  .glass-panel {
+    @apply bg-[#ffffffb3] backdrop-blur-md border border-white/40 shadow-sm rounded-2xl;
+  }
+
+  /* KPI Card */
+  .kpi-card {
+    @apply bg-white border border-slate-100 rounded-2xl p-6 transition-all duration-200 cursor-pointer;
+    box-shadow: var(--shadow-soft);
+  }
+  .kpi-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+    @apply border-teal-100;
+  }
+
+  /* ── Card (legacy alias for clinical-card) ──────────────────── */
+  .card {
+    @apply bg-white border border-slate-200/60 rounded-2xl transition-all duration-200;
+    box-shadow: var(--shadow-soft);
+  }
+  .card-header {
+    @apply px-5 py-3.5 border-b border-slate-100 flex items-center justify-between;
+  }
+
+  /* ── Queue Row ──────────────────────────────────────────────── */
+  .queue-card {
+    @apply flex items-center cursor-pointer transition-all duration-150 hover:bg-teal-50/40;
+  }
+
+  /* ── Buttons — Complete Set ─────────────────────────────── */
+  .btn-primary {
+    @apply px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl active:scale-[0.97] transition-all duration-150 flex items-center justify-center gap-2 whitespace-nowrap;
+    box-shadow: var(--shadow-brand);
+  }
+  /* Alias */
+  .btn-premium {
+    @apply px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl active:scale-[0.97] transition-all duration-150 flex items-center justify-center gap-2 whitespace-nowrap;
+    box-shadow: var(--shadow-brand);
+  }
+
+  .btn-secondary {
+    @apply px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 text-sm font-semibold rounded-xl shadow-sm active:scale-[0.97] transition-all duration-150 flex items-center justify-center gap-2 whitespace-nowrap;
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2 bg-transparent hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-sm font-semibold rounded-xl active:scale-[0.97] transition-all duration-150 flex items-center justify-center gap-2;
+  }
+
+  .btn-danger {
+    @apply px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-rose-600/20 active:scale-[0.97] transition-all duration-150 flex items-center justify-center gap-2;
+  }
+
+  .btn-success {
+    @apply px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-emerald-600/20 active:scale-[0.97] transition-all duration-150 flex items-center justify-center gap-2;
+  }
+
+  /* Icon-only button */
+  .btn-icon {
+    @apply h-9 w-9 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-900 rounded-xl shadow-sm active:scale-[0.97] transition-all duration-150 flex items-center justify-center;
+  }
+
+  /* ── Form Elements ──────────────────────────────────────── */
+  .input {
+    @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all placeholder:text-slate-400 text-slate-800 font-medium;
+  }
+
+  .input-sm {
+    @apply w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-teal-500/10 focus:border-teal-400 outline-none transition-all placeholder:text-slate-400 text-slate-700 text-sm;
+  }
+
+  /* ── Typography ─────────────────────────────────────────── */
+  .section-title {
+    @apply text-lg font-bold text-slate-900 flex items-center gap-2 mb-4;
+  }
+  .page-title {
+    @apply text-2xl font-extrabold text-slate-900 tracking-tight;
+  }
+  .page-subtitle {
+    @apply text-sm text-slate-500 font-medium mt-1;
+  }
+
+  /* ── Navigation ─────────────────────────────────────────── */
+  .nav-link {
+    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-xl mx-2 text-[13px] font-medium text-slate-500 hover:bg-white hover:text-teal-700 hover:shadow-sm transition-all cursor-pointer;
+  }
+  .nav-link-active {
+    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-xl mx-2 text-[13px] font-semibold text-teal-700 bg-white shadow-sm ring-1 ring-slate-200/50 cursor-pointer;
+  }
+
+  /* ── Status Pulse ───────────────────────────────────────── */
+  .status-pulse      { @apply relative flex h-2 w-2; }
+  .status-pulse-dot  { @apply animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-teal-400; }
+  .status-pulse-inner{ @apply relative inline-flex rounded-full h-2 w-2 bg-teal-500; }
+
+  /* ── Badges / Chips ─────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold tracking-wide;
+  }
+  .badge-success { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .badge-warning { @apply bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-danger  { @apply bg-rose-50 text-rose-700 border border-rose-200; }
+  .badge-info    { @apply bg-sky-50 text-sky-700 border border-sky-200; }
+  .badge-brand   { @apply bg-teal-50 text-teal-700 border border-teal-200; }
+  .badge-neutral { @apply bg-slate-100 text-slate-600 border border-slate-200; }
+  /* Shorthand aliases used across dashboards */
+  .badge-teal   { @apply badge bg-teal-50 text-teal-700 border border-teal-200; }
+  .badge-red    { @apply badge bg-rose-50 text-rose-700 border border-rose-200; }
+  .badge-amber  { @apply badge bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-blue   { @apply badge bg-sky-50 text-sky-700 border border-sky-200; }
+  .badge-green  { @apply badge bg-emerald-50 text-emerald-700 border border-emerald-200; }
+  .badge-purple { @apply badge bg-purple-50 text-purple-700 border border-purple-200; }
+
+  /* ── Modals ─────────────────────────────────────────────── */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4;
+    animation: fadeIn 0.15s ease-out;
+  }
+  .modal-box {
+    @apply bg-white rounded-2xl w-full max-w-md overflow-hidden;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.18s ease-out;
+  }
+  .modal-box-lg {
+    @apply bg-white rounded-2xl w-full max-w-2xl overflow-hidden;
+    box-shadow: var(--shadow-lg);
+    animation: scaleIn 0.18s ease-out;
+  }
+  .modal-header {
+    @apply px-6 py-4 border-b border-slate-100 flex items-center justify-between;
+  }
+  .modal-body   { @apply p-6; }
+  .modal-footer { @apply px-6 py-4 border-t border-slate-100 flex gap-3 justify-end; }
+
+  /* ── Tables (High Density) ──────────────────────────────── */
+  .clinical-table { @apply w-full text-left text-[13px] border-collapse; }
+  .clinical-table thead tr  { @apply border-b border-slate-100 bg-slate-50/50; }
+  .clinical-table th { @apply px-4 py-3 font-semibold text-slate-400 uppercase tracking-wider text-[11px] whitespace-nowrap; }
+  .clinical-table td { @apply px-4 py-3.5 border-b border-slate-50 text-slate-700; }
+  .clinical-table tr:hover  { @apply bg-slate-50/80; }
+
+  /* Table responsive wrapper */
+  .table-responsive-wrapper {
+    @apply w-full overflow-x-auto rounded-xl;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Panels / Info blocks ───────────────────────────────── */
+  .info-row {
+    @apply flex items-center justify-between py-3 border-b border-slate-50 last:border-0;
+  }
+  .info-label { @apply text-xs font-bold text-slate-400 uppercase tracking-wider; }
+  .info-value { @apply text-sm font-semibold text-slate-800 text-right; }
+
+  /* ── Empty State ────────────────────────────────────────── */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+  }
+  .empty-state-icon {
+    @apply h-14 w-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-4;
+  }
+
+  /* ── Page Header ────────────────────────────────────────── */
+  .page-header {
+    @apply flex flex-wrap items-end justify-between gap-4 mb-8;
+  }
+
+  /* ── Slide-out Drawer ───────────────────────────────────── */
+  .drawer-overlay {
+    @apply fixed inset-0 bg-slate-900/30 backdrop-blur-[2px] z-40;
+    animation: fadeIn 0.15s ease-out;
+  }
+  .drawer-panel {
+    @apply fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col overflow-hidden;
+    animation: slideLeft 0.2s ease-out;
+  }
+
+  /* ── Responsive Grid ────────────────────────────────────── */
+  .responsive-grid {
+    @apply grid gap-4;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   UTILITY EXTENSIONS
+═══════════════════════════════════════════════════════════ */
+@layer utilities {
+  .text-medical  { color: var(--clinical-primary); }
+  .bg-medical    { background-color: var(--clinical-primary); }
+
+  /* Shimmer skeleton */
+  .shimmer {
+    background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s infinite linear;
+  }
+
+  /* Scrollbar hide */
+  .noscroll::-webkit-scrollbar { display: none; }
+  .noscroll { scrollbar-width: none; }
+
+  /* Text clamp */
+  .truncate-2-lines {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-clamp: 2;
+  }
+
+  /* Animate utilities */
+  .animate-fade-in    { animation: fadeIn     0.2s  ease-out both; }
+  .animate-slide-up   { animation: slideUp    0.22s ease-out both; }
+  .animate-scale-in   { animation: scaleIn    0.18s ease-out both; }
+  .animate-slide-left { animation: slideLeft  0.2s  ease-out both; }
+  /* Notification badge pulse */
+  .animate-bounce-short { animation: bounceShort 0.6s ease-in-out 3; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   KEYFRAMES
+═══════════════════════════════════════════════════════════ */
+@keyframes shimmer     { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes fadeIn      { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp     { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn     { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideLeft   { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes bounceShort { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+
+/* ═══════════════════════════════════════════════════════════
+   DEVICE-LEVEL RESPONSIVE DESIGN
+═══════════════════════════════════════════════════════════ */
+
+/* Large Desktop (1280px+) */
+@media screen and (min-width: 1280px) {
+  .responsive-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; }
+}
+
+/* Desktop (1024–1279px) */
+@media screen and (min-width: 1024px) and (max-width: 1279px) {
+  .responsive-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; }
+}
+
+/* Tablet & iPad (768–1023px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .responsive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+  .clinical-card { padding: 1.25rem !important; }
+  .page-title { font-size: 1.75rem !important; }
+}
+
+/* Mobile (≤767px) */
+@media screen and (max-width: 767px) {
+  html { font-size: 13px; }
+
+  /* Force all Tailwind grid layouts to stack */
+  .responsive-grid,
+  [class*="grid-cols-"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1rem !important;
+  }
+
+  /* Cards */
+  .clinical-card, .kpi-card {
+    padding: 1rem !important;
+    border-radius: 0.75rem !important;
+  }
+  .clinical-card:hover, .kpi-card:hover {
+    transform: none !important;
+  }
+
+  /* Typography */
+  .page-title  { font-size: 1.5rem !important; }
+  .premium-text.text-3xl { font-size: 1.5rem !important; }
+
+  /* All tables globally scrollable */
+  .table-responsive-wrapper, table, .clinical-table {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+  }
+
+  /* Buttons */
+  .btn-primary, .btn-premium {
+    padding: 0.6rem 1rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Inputs */
+  .input { font-size: 1rem !important; } /* prevents iOS zoom */
+
+  /* Drawer: full-width on mobile */
+  .drawer-panel { max-width: 100% !important; }
+
+  /* Utility */
+  .page-header { flex-direction: column !important; align-items: stretch !important; }
+  .flex-col-mobile { flex-direction: column !important; align-items: stretch !important; }
+}
+
+/* Extra small (≤480px) */
+@media screen and (max-width: 480px) {
+  html { font-size: 12.5px; }
+  .responsive-grid { gap: 0.75rem !important; }
+  .xs-hide  { display: none !important; }
+  .xs-block { display: block !important; }
+}

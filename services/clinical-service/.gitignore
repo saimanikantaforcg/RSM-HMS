@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables — NEVER commit real secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# SQLite dev databases
+*.sqlite
+*.sqlite3
+hms_db
+hms_db_test
+
+# TypeScript incremental build
+*.tsbuildinfo
+
+# Test coverage
+coverage/

@@ -1,0 +1,10 @@
+{
+  "name": "next-gen-hms-ecosystem",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise Hospital Management System Root Workspace",
+  "scripts": {
+    "start:all": "npx concurrently -k -c \"bgBlue.bold,bgMagenta.bold,bgGreen.bold\" -n \"AUTH,CLINICAL,FRONTEND\" \"cd services/auth-service && npm run start:dev\" \"cd services/clinical-service && npm run start:dev\" \"cd frontend && npm run dev\"",
+    "install:all": "cd frontend && npm install && cd ../services/auth-service && npm install && cd ../clinical-service && npm install"
+  }
+}

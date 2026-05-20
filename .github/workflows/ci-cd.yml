@@ -1,0 +1,244 @@
+﻿name: RSM HMS — CI/CD
+
+on:
+  push:
+    branches: [main, production]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/rsm-hms
+
+# ─── Job 1: Lint & Type-check ─────────────────────────────────────────────────
+jobs:
+  lint:
+    name: Lint & Type-check (${{ matrix.service }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [clinical-service, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            services/${{ matrix.service }}/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install deps
+        run: |
+          if [ "${{ matrix.service }}" = "frontend" ]; then
+            cd frontend && npm ci
+          else
+            cd services/${{ matrix.service }} && npm ci
+          fi
+
+      - name: Lint
+        run: |
+          if [ "${{ matrix.service }}" = "frontend" ]; then
+            cd frontend && npm run lint
+          else
+            cd services/${{ matrix.service }} && npm run lint
+          fi
+
+      - name: Type-check (backend only)
+        if: matrix.service != 'frontend'
+        run: cd services/${{ matrix.service }} && npx tsc --noEmit
+
+# ─── Job 2: Test ──────────────────────────────────────────────────────────────
+  test:
+    name: Test (${{ matrix.service }})
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [clinical-service]
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: hms_test
+          POSTGRES_PASSWORD: hms_test
+          POSTGRES_DB: hms_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      DB_TYPE: postgres
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: hms_test
+      DB_PASS: hms_test
+      DB_NAME: hms_test
+      DB_SSL: 'false'
+      JWT_SECRET: ci-jwt-secret-minimum-32-chars-for-test
+      JWT_REFRESH_SECRET: ci-refresh-secret-minimum-32-chars-test
+      COOKIE_SECRET: ci-cookie-secret-for-test-only-32
+      ENCRYPTION_KEY: 0000000000000000000000000000000000000000000000000000000000000000
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      USE_REDIS_MOCK: 'false'
+      FRONTEND_URL: http://localhost:5173
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package-lock.json
+
+      - name: Install deps
+        run: cd services/${{ matrix.service }} && npm ci
+
+      - name: Run unit & integration tests
+        run: cd services/${{ matrix.service }} && npm test -- --forceExit --coverage
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.service }}
+          path: services/${{ matrix.service }}/coverage/
+
+# ─── Job 3: Build ─────────────────────────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.service }})
+    needs: lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: clinical-service
+            context: services/clinical-service
+          - service: frontend
+            context: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install deps & build
+        run: |
+          if [ "${{ matrix.service }}" = "frontend" ]; then
+            cd frontend && npm ci && npm run build
+          else
+            cd services/${{ matrix.service }} && npm ci && npm run build
+          fi
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.service }}
+          path: |
+            services/${{ matrix.service }}/dist/
+            frontend/dist/
+          if-no-files-found: ignore
+
+# ─── Job 4: Security Scan ─────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+# ─── Job 5: Docker Build & Push (main branch only) ────────────────────────────
+  docker:
+    name: Docker (${{ matrix.service }})
+    needs: [test, build, security]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    strategy:
+      matrix:
+        include:
+          - service: clinical-service
+            context: services/clinical-service
+            dockerfile: services/clinical-service/Dockerfile
+          - service: frontend
+            context: frontend
+            dockerfile: frontend/Dockerfile
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+

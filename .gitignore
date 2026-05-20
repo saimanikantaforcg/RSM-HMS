@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Environment variables — NEVER commit real secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# SQLite dev databases
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+hms_db
+hms_db_test
+
+# Backend / build artefacts
+services/clinical-service/backend_log.txt
+frontend/build_err.txt
+frontend/build_out.txt
+frontend/lint_out.txt
+e2e-output.json
+e2e-final.json
+services/clinical-service/e2e-output.json
+services/clinical-service/e2e-final.json
+services/*/dist/
+
+# Sentry / OpenTelemetry
+.sentryclirc
