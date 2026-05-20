@@ -51,9 +51,9 @@ export default function Dashboard() {
     api.get('/appointments') // In a real app, query by date=today
       .then(res => res.json())
       .then(d => {
-        const list = d?.data ?? d ?? [];
+        const list = d?.data?.data ?? d?.data ?? d ?? [];
         setAppointments(Array.isArray(list) ? list.slice(0, 4) : []);
-        setStats(s => ({ ...s, appointments: list.length || 0 }));
+        setStats(s => ({ ...s, appointments: Array.isArray(list) ? list.length : 0 }));
       })
       .catch(() => setAppointments([]))
       .finally(() => setLoadingApts(false));
@@ -65,7 +65,7 @@ export default function Dashboard() {
       api.get('/lab-orders').then(r => r.json()).catch(() => ({}))
     ]).then(([patRes, billingRes, labRes]) => {
       const billingData = billingRes?.data ?? billingRes ?? {};
-      const labData = labRes?.data ?? labRes ?? [];
+      const labData = labRes?.data?.data ?? labRes?.data ?? labRes ?? [];
       const pendingLabCount = Array.isArray(labData)
         ? labData.filter(o => o.status === 'Pending' || o.status === 'In Process').length
         : 0;
@@ -78,7 +78,7 @@ export default function Dashboard() {
         labs: pendingLabCount,
       }));
       setLoadingStats(false);
-    });
+    }).catch(() => setLoadingStats(false));
 
     return () => clearInterval(interval);
   }, []);

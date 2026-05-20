@@ -53,7 +53,7 @@ export default function Billing() {
       if (!res.ok) return;
       const json = await res.json();
       const payload = json?.data ?? json;
-      if (Array.isArray(payload)) setCatalog(payload);
+      setCatalog(Array.isArray(payload) ? payload : (payload?.data ?? []));
     } catch (e) { console.error('Catalog fetch failed', e); }
   };
 
@@ -63,7 +63,8 @@ export default function Billing() {
       if (!res.ok) throw new Error('API down');
       const json = await res.json();
       const payload = json?.data ?? json;
-      if (Array.isArray(payload)) setInvoices(payload);
+      const list = Array.isArray(payload) ? payload : (payload?.data ?? []);
+      setInvoices(list);
       fetchStats();
     } catch {
       setInvoices([]);
@@ -99,31 +100,46 @@ export default function Billing() {
   const handleCharge = async () => {
     if (!patientName) return toast.error('Patient name is required');
     if (cart.length === 0) return toast.error('Add at least one service to the bill');
-
-    const amount = finalTotal;
     try {
-      const res = await api.post('/billing/pay', { 
-        patient: patientName, 
-        amount, 
-        status: 'Paid',
-        method: 'Cash' // Default for POS
+      // Step 1: Create draft invoice
+      const invRes = await api.post('/billing/invoices', { patientName });
+      if (!invRes.ok) throw new Error('Invoice creation failed');
+      const invData = await invRes.json();
+      const invoiceId = invData?.data?.id ?? invData?.id;
+      if (!invoiceId) throw new Error('No invoice ID returned');
+
+      // Step 2: Add line items
+      await Promise.all(cart.map(item =>
+        api.post(`/billing/invoices/${invoiceId}/items`, { catalogId: item.id, quantity: item.qty })
+      ));
+
+      // Step 3: Apply discount if any
+      if (discountPercent > 0) {
+        await api.patch(`/billing/invoices/${invoiceId}/discount`, { discountPercent });
+      }
+
+      // Step 4: Collect payment
+      const payRes = await api.post(`/billing/invoices/${invoiceId}/pay`, {
+        amount: finalTotal,
+        method: 'Cash'
       });
-      if (!res.ok) throw new Error('Failed');
-      
+      if (!payRes.ok) throw new Error('Payment collection failed');
+
       toast.success('Payment Processed & Invoice Generated');
       setIsModalOpen(false);
       setCart([]);
       setPatientName('');
       setDiscountPercent(0);
       fetchInvoices();
-    } catch {
-      toast.error('Payment gateway unreachable.');
+    } catch (err) {
+      console.error('Charge error:', err);
+      toast.error('Payment processing failed. Please try again.');
     }
   };
 
   const handleCollect = async (id) => {
     try {
-      const res = await api.post('/billing/pay', { invoiceId: id, method: 'Cash' });
+      const res = await api.post(`/billing/invoices/${id}/pay`, { method: 'Cash' });
       if (!res.ok) throw new Error('Payment failed');
       toast.success('Payment collected successfully');
       fetchInvoices();

@@ -242,7 +242,7 @@ export default function IPD() {
                 if (!res.ok) throw new Error('Failed');
                 toast.success(`${formData.name} admitted successfully`);
               } catch {
-                toast.success(`${formData.name} admitted successfully`);
+                toast.error('Admission failed. Please try again.');
               }
               setIsModalOpen(false); 
               setFormData({ name: '', dx: '', consultant: 'Dr. Smith' });

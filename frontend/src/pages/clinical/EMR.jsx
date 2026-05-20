@@ -27,10 +27,14 @@ export default function EMR() {
   const fetchNotes = async () => {
     try {
       const res = await api.get('/emr/notes');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       const payload = json?.data ?? json;
       if (Array.isArray(payload)) {
         setNotes(payload);
+        setError(false);
+      } else {
+        setNotes([]);
         setError(false);
       }
     } catch {
@@ -42,10 +46,15 @@ export default function EMR() {
 
   useEffect(() => { fetchNotes(); }, []);
 
+  useEffect(() => {
+    if (user?.name) setFormData(f => ({ ...f, author: user.name }));
+  }, [user]);
+
   const handleSign = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/emr/sign', formData);
+      const res = await api.post('/emr/sign', formData);
+      if (!res.ok) throw new Error('Sign failed');
       toast.success(`Clinical Note Signed by ${formData.author}`);
       setIsModalOpen(false);
       setFormData({ patient: '', type: 'Progress Note', author: authorName, content: '' });

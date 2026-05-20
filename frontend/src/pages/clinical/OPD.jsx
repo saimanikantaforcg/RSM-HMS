@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +22,7 @@ const walkInSchema = z.object({
 });
 
 export default function OPD() {
+  const navigate = useNavigate();
   const [queue, setQueue] = useState([]);
   const [opdStats, setOpdStats] = useState({ avgWaitMin: null, seenToday: null, capacityPct: null });
   const [selectedPatient, setSelectedPatient] = useState(null);

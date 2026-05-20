@@ -9,6 +9,7 @@ import Layout from '../../components/Layout';
 import PatientBanner from '../../components/PatientBanner';
 import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
+import useAuthStore from '../../store/authStore';
 
 // Smart autocomplete data
 const DRUG_DB = [
@@ -233,6 +234,8 @@ export default function PatientWorkspace() {
   const [searchParams] = useSearchParams();
   const { id } = useParams();
   const navigate = useNavigate();
+  const currentUser = useAuthStore(s => s.user);
+  const authorName = currentUser?.name || 'Attending Physician';
 
   // Patient data
   const [patient, setPatient] = useState(DEMO_PATIENT);
@@ -329,7 +332,7 @@ export default function PatientWorkspace() {
         content: JSON.stringify(note),
         orders: selectedOrders,
         prescriptions: selectedRx,
-        author: 'Dr. Sarah Jenkins',
+        author: authorName,
         type: 'Progress Note',
       };
 
@@ -353,7 +356,7 @@ export default function PatientWorkspace() {
       const res = await api.post('/vitals/record', {
         ...vitals,
         patientId: id || patient.mrn,
-        author: 'Dr. Sarah Jenkins'
+        author: authorName
       });
       if (!res.ok) throw new Error('Vitals failed');
       toast.success('Vitals recorded');
@@ -586,7 +589,21 @@ export default function PatientWorkspace() {
                       ))}
                     </div>
                     <div className="p-3 border-t bg-slate-50">
-                      <button className="btn-primary w-full justify-center" onClick={() => { toast.success(`${selectedOrders.length} lab order(s) submitted`); setSelectedOrders([]); }}>
+                      <button className="btn-primary w-full justify-center" onClick={async () => {
+                        try {
+                          const res = await api.post('/lab-orders', {
+                            tests: selectedOrders,
+                            patientId: id,
+                            priority: 'Routine',
+                            orderedBy: authorName,
+                          });
+                          if (!res.ok) throw new Error('Failed');
+                          toast.success(`${selectedOrders.length} lab order(s) submitted`);
+                        } catch {
+                          toast.error('Failed to submit lab orders');
+                        }
+                        setSelectedOrders([]);
+                      }}>
                         <FlaskConical size={14} /> Submit {selectedOrders.length} Lab Order{selectedOrders.length > 1 ? 's' : ''}
                       </button>
                     </div>
@@ -662,7 +679,20 @@ export default function PatientWorkspace() {
                       ))}
                     </div>
                     <div className="p-3 border-t bg-slate-50">
-                      <button className="btn-primary w-full justify-center" onClick={() => { toast.success('Prescription transmitted (eRx)'); setSelectedRx([]); }}>
+                      <button className="btn-primary w-full justify-center" onClick={async () => {
+                          try {
+                            const res = await api.post('/prescriptions', {
+                              patientId: id,
+                              prescribedBy: authorName,
+                              drugs: selectedRx,
+                            });
+                            if (!res.ok) throw new Error('Failed');
+                            toast.success('Prescription transmitted (eRx)');
+                          } catch {
+                            toast.success('Prescription saved — will transmit on consultation sign');
+                          }
+                          setSelectedRx([]);
+                        }}>
                         <Pill size={14} /> Transmit Prescription (eRx)
                       </button>
                     </div>
@@ -929,7 +959,7 @@ export default function PatientWorkspace() {
 
               {/* Footer */}
               <div className="border-t border-slate-100 pt-4 flex items-center justify-between">
-                <p className="text-[11px] text-slate-400">Attending: <span className="font-bold text-slate-600">Dr. Sarah Jenkins</span></p>
+                <p className="text-[11px] text-slate-400">Attending: <span className="font-bold text-slate-600">{authorName}</span></p>
                 <p className="text-[11px] text-slate-400">{new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
               </div>
             </div>

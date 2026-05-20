@@ -37,7 +37,7 @@ export default function DoctorDashboard() {
         // 3. Lab Results (LIS)
         const lRes = await api.get('/lab-orders');
         const lData = await lRes.json();
-        const lList = (lData?.data ?? lData ?? []).slice(0, 4);
+        const lList = (lData?.data?.data ?? lData?.data ?? lData ?? []).slice(0, 4);
 
         // 4. Appointments
         const today = new Date().toISOString().split('T')[0];

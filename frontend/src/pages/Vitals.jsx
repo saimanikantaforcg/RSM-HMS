@@ -91,8 +91,8 @@ export default function Vitals() {
                 <td className="px-6 py-4 font-bold text-blue-600">{v.bp}</td>
                 <td className="px-6 py-4 font-bold text-red-500">{v.hr}</td>
                 <td className="px-6 py-4 font-bold text-orange-500">{v.temp}</td>
-                <td className="px-6 py-4 font-bold text-green-500">{v.o2}</td>
-                <td className="px-6 py-4 text-sm text-slate-500">{v.date} {v.time}</td>
+                <td className="px-6 py-4 font-bold text-green-500">{v.spo2}</td>
+                <td className="px-6 py-4 text-sm text-slate-500">{v.createdAt ? new Date(v.createdAt).toLocaleString() : '—'}</td>
               </tr>
             ))}
           </tbody>

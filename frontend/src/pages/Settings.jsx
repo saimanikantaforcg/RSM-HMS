@@ -10,7 +10,7 @@ export default function Settings() {
   useEffect(() => {
     api.get('/settings/config')
       .then(res => res.json())
-      .then(data => { if (data) setConfig(data); })
+      .then(data => { const cfg = data?.data ?? data; if (cfg && cfg.hospitalName !== undefined) setConfig(cfg); })
       .catch(() => {});
   }, []);
 
