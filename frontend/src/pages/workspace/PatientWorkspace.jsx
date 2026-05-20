@@ -91,6 +91,7 @@ export default function PatientWorkspace() {
   const [history, setHistory] = useState([]);
   const [vitalsHistory, setVitalsHistory] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   const fetchHistory = async () => {
     try {
@@ -216,7 +217,7 @@ export default function PatientWorkspace() {
           <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-md">In-Progress</span>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
-          <button onClick={() => toast('Discharge preparation...', { icon: '📄' })} className="btn-secondary py-2 px-4 shadow-sm">
+          <button onClick={() => setShowSummary(true)} className="btn-secondary py-2 px-4 shadow-sm">
             <Printer size={14} /> <span className="hidden lg:inline">Summary</span>
           </button>
           <button disabled={saving} onClick={handleSave} className="btn-premium px-6 py-2">
@@ -598,6 +599,159 @@ export default function PatientWorkspace() {
         </div>
       </div>
      </div>
+
+      {/* ── 📄 Discharge Summary Modal ─────────────────────────────── */}
+      {showSummary && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setShowSummary(false)}>
+          <div
+            id="summary-print-area"
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 sticky top-0 bg-white z-10 rounded-t-2xl">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 bg-teal-50 rounded-xl flex items-center justify-center border border-teal-100">
+                  <Printer size={16} className="text-teal-600" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-black text-slate-900">Clinical Encounter Summary</h2>
+                  <p className="text-[11px] text-slate-400">{new Date().toLocaleString('en-IN', { dateStyle: 'long', timeStyle: 'short' })}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const style = document.createElement('style');
+                    style.textContent = '@media print { body > *:not(#summary-print-root) { display: none !important; } #summary-print-root { display: block !important; } }';
+                    document.head.appendChild(style);
+                    window.print();
+                    setTimeout(() => document.head.removeChild(style), 500);
+                  }}
+                  className="btn-premium py-1.5 px-4 text-xs"
+                >
+                  <Printer size={13} /> Print
+                </button>
+                <button onClick={() => setShowSummary(false)} className="h-8 w-8 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-400 transition-all">
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Summary body */}
+            <div className="px-6 py-5 space-y-5 text-sm">
+
+              {/* Patient Info */}
+              <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Patient</p>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
+                  <div><span className="text-[11px] text-slate-400">Name</span><p className="text-xs font-bold text-slate-800">{patient.name}</p></div>
+                  <div><span className="text-[11px] text-slate-400">MRN</span><p className="text-xs font-bold text-slate-800">{patient.mrn}</p></div>
+                  <div><span className="text-[11px] text-slate-400">DOB / Age</span><p className="text-xs font-bold text-slate-800">{patient.dob} ({patient.age} yrs)</p></div>
+                  <div><span className="text-[11px] text-slate-400">Gender</span><p className="text-xs font-bold text-slate-800">{patient.gender}</p></div>
+                  <div><span className="text-[11px] text-slate-400">Blood Group</span><p className="text-xs font-bold text-slate-800">{patient.blood}</p></div>
+                  <div><span className="text-[11px] text-slate-400">Insurance</span><p className="text-xs font-bold text-slate-800">{patient.insurance ?? '—'}</p></div>
+                </div>
+              </div>
+
+              {/* Allergies */}
+              {patient.allergies?.length > 0 && (
+                <div className="bg-rose-50 rounded-xl p-4 border border-rose-100">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-rose-600 mb-2">⚠ Allergies</p>
+                  {patient.allergies.map(a => (
+                    <p key={a.drug} className="text-xs font-bold text-rose-800">{a.drug} — {a.reaction} <span className="font-normal text-rose-600">({a.severity})</span></p>
+                  ))}
+                </div>
+              )}
+
+              {/* Diagnoses */}
+              {patient.diagnoses?.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Active Diagnoses</p>
+                  <div className="flex flex-wrap gap-2">
+                    {patient.diagnoses.map(d => (
+                      <span key={d} className="px-3 py-1 bg-blue-50 text-blue-800 border border-blue-100 rounded-lg text-[11px] font-bold">{d}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* SOAP Notes */}
+              {(note.subjective || note.objective || note.assessment || note.plan) && (
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">SOAP Notes</p>
+                  <div className="space-y-2">
+                    {[['S — Subjective', note.subjective], ['O — Objective', note.objective], ['A — Assessment', note.assessment], ['P — Plan', note.plan]]
+                      .filter(([, v]) => v)
+                      .map(([label, val]) => (
+                        <div key={label} className="rounded-xl border border-slate-100 px-4 py-3">
+                          <p className="text-[10px] font-black text-slate-500 mb-1">{label}</p>
+                          <p className="text-xs text-slate-700 whitespace-pre-wrap">{val}</p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+              {!note.subjective && !note.objective && !note.assessment && !note.plan && (
+                <div className="text-center py-3 text-xs text-slate-400 italic bg-slate-50 rounded-xl border border-slate-100">No SOAP notes entered for this encounter</div>
+              )}
+
+              {/* Vitals */}
+              {(vitals.bp || vitals.hr || vitals.spo2 || vitals.temp) && (
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Vitals Recorded</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[['BP', vitals.bp, 'mmHg'], ['HR', vitals.hr, 'bpm'], ['SpO₂', vitals.spo2, '%'], ['Temp', vitals.temp, '°F'], ['RR', vitals.rr, '/min'], ['Weight', vitals.weight, 'kg']]
+                      .filter(([, v]) => v)
+                      .map(([label, val, unit]) => (
+                        <div key={label} className="bg-slate-50 rounded-xl p-3 border border-slate-100 text-center">
+                          <p className="text-[10px] font-black text-slate-400">{label}</p>
+                          <p className="text-sm font-black text-slate-800">{val} <span className="text-[10px] font-normal text-slate-400">{unit}</span></p>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Lab Orders */}
+              {selectedOrders.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Lab Orders</p>
+                  <div className="space-y-1.5">
+                    {selectedOrders.map(o => (
+                      <div key={o.code} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-2.5 border border-slate-100">
+                        <p className="text-xs font-bold text-slate-800">{o.name}</p>
+                        <span className="text-[10px] font-bold text-slate-400">{o.turnaround}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Prescriptions */}
+              {selectedRx.length > 0 && (
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Prescriptions</p>
+                  <div className="space-y-1.5">
+                    {selectedRx.map(r => (
+                      <div key={r.name} className="bg-slate-50 rounded-xl px-4 py-2.5 border border-slate-100">
+                        <p className="text-xs font-bold text-slate-800">{r.name}</p>
+                        <p className="text-[11px] text-slate-500">{r.sig} · Qty: {r.qty}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="border-t border-slate-100 pt-4 flex items-center justify-between">
+                <p className="text-[11px] text-slate-400">Attending: <span className="font-bold text-slate-600">Dr. Sarah Jenkins</span></p>
+                <p className="text-[11px] text-slate-400">{new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
