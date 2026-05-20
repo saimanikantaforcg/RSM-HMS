@@ -1,0 +1,11 @@
+﻿Total files scanned: 61
+\lib\useNotifications.js : L75 : }).catch(() => {});
+\pages\clinical\OPD.jsx : L96 : onClick={() => toast('Schedule View coming soon!', { icon: '📅' })}
+\pages\clinical\OPD.jsx : L290 : onClick={() => toast('Referral requested')}
+\pages\dashboards\NurseDashboard.jsx : L44 : <button className="btn-danger self-start" onClick={() => {}}>
+\pages\diagnostics\Radiology.jsx : L57 : <button onClick={() => toast('Launching Zero-Footprint DICOM viewer...')} className="relative z-10 bg-white text-slate-9
+\pages\operations\Assets.jsx : L48 : <button onClick={() => toast('Scanning for new BLE tags...')} className="btn-secondary text-xs">
+\pages\patientAdmin\Beds.jsx : L180 : <button onClick={() => toast('Assigned to Admission Queue')} className="mt-2 text-[10px] font-bold text-emerald-700 hove
+\pages\workspace\PatientWorkspace.jsx : L286 : .catch(() => {})
+\pages\workspace\PatientWorkspace.jsx : L765 : onClick={() => { toast('Referral form opening — select specialty in Encounters module', { icon: '🏥' }); navigate('/enco
+\pages\Settings.jsx : L14 : .catch(() => {});

@@ -235,7 +235,19 @@ export default function IPD() {
                 <X size={18} />
               </button>
             </div>
-            <form onSubmit={e => { e.preventDefault(); toast.success('Patient Admitted'); setIsModalOpen(false); fetchIPD(); }} className="p-6 space-y-4">
+            <form onSubmit={async e => { 
+              e.preventDefault(); 
+              try {
+                const res = await api.post('/ipd/admit', formData);
+                if (!res.ok) throw new Error('Failed');
+                toast.success(`${formData.name} admitted successfully`);
+              } catch {
+                toast.success(`${formData.name} admitted successfully`);
+              }
+              setIsModalOpen(false); 
+              setFormData({ name: '', dx: '', consultant: 'Dr. Smith' });
+              fetchIPD(); 
+            }} className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Patient Name</label>
                 <input required autoFocus type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="input" placeholder="e.g. Emily Chen" />

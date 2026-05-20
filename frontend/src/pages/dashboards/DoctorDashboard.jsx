@@ -141,7 +141,7 @@ export default function DoctorDashboard() {
                 <div 
                   key={idx} 
                   className="p-5 hover:bg-slate-50/80 transition-all flex items-center justify-between group cursor-pointer"
-                  onClick={() => navigate(`/clinical/emr/${p.patientId}?encounter=${p.id}`)}
+                  onClick={() => navigate(`/workspace/${p.patientId}`)}
                 >
                   <div className="flex items-center gap-4">
                     <div className="h-11 w-11 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-sm font-black shadow-sm group-hover:scale-105 transition-transform">
@@ -213,7 +213,7 @@ export default function DoctorDashboard() {
               ))}
             </div>
             <div className="p-3 bg-slate-50/50 text-center border-t border-slate-100">
-               <button onClick={() => navigate('/lis')} className="text-[10px] font-bold text-slate-400 hover:text-brand-600 uppercase tracking-widest transition-colors">
+               <button onClick={() => navigate('/laboratory')} className="text-[10px] font-bold text-slate-400 hover:text-brand-600 uppercase tracking-widest transition-colors">
                 Open Lab Monitor
                </button>
             </div>
@@ -225,7 +225,7 @@ export default function DoctorDashboard() {
             <p className="text-brand-100 text-[10px] font-medium leading-relaxed mb-4">
               Use voice dictation or the command bar to quickly record vitals or order new labs.
             </p>
-            <button className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-bold transition-all backdrop-blur-sm">
+            <button onClick={() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true, cancelable: true })); }} className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-bold transition-all backdrop-blur-sm">
               Launch Assistant
             </button>
           </div>

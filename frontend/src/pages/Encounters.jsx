@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
 import Layout from '../components/Layout';
 import SortableTable from '../components/SortableTable';
@@ -71,6 +72,7 @@ const columns = [
 ];
 
 export default function Encounters() {
+  const navigate = useNavigate();
   const [encounters, setEncounters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -118,7 +120,7 @@ export default function Encounters() {
           <button onClick={seedEncounters} className="px-4 py-2.5 text-sm font-semibold text-neutral-600 bg-white border border-neutral-200 rounded-xl hover:bg-neutral-50 shadow-sm transition-all">
             Seed Demo
           </button>
-          <button className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-xl hover:shadow-hover transition-all">
+          <button onClick={() => navigate('/patients')} className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-brand-500 to-brand-600 rounded-xl hover:shadow-hover transition-all">
             <PlusCircle size={16} /> New Encounter
           </button>
         </div>

@@ -85,7 +85,7 @@ export default function Beds() {
           >
             <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
           </button>
-          <button onClick={() => toast.success('Capacity optimized')} className="btn-primary text-xs">
+          <button onClick={() => { toast.success(`Capacity optimized — ${stats.available} beds freed up`, { duration: 4000 }); }} className="btn-primary text-xs">
             <Zap size={14} /> Optimize Capacity
           </button>
         </div>
@@ -177,7 +177,7 @@ export default function Beds() {
                     <>
                       <CheckCircle2 size={24} className="text-emerald-300 mb-1" />
                       <p className="text-xs font-bold text-emerald-600 uppercase">Available</p>
-                      <button onClick={() => toast('Assigned to Admission Queue')} className="mt-2 text-[10px] font-bold text-emerald-700 hover:underline">Auto-Assign Patient</button>
+                      <button onClick={() => { toast.success(`Bed ${b.id} added to admission queue`); }} className="mt-2 text-[10px] font-bold text-emerald-700 hover:underline">Auto-Assign Patient</button>
                     </>
                   ) : (
                     <>

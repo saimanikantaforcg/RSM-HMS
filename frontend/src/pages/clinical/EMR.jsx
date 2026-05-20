@@ -16,6 +16,13 @@ export default function EMR() {
   const authorName = user?.name || 'Authorized Provider';
   const [formData, setFormData] = useState({ patient: '', type: 'Progress Note', author: authorName, content: '' });
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredNotes = notes.filter(n =>
+    !searchTerm ||
+    n.patient?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    n.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    n.type?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const fetchNotes = async () => {
     try {
@@ -56,7 +63,7 @@ export default function EMR() {
         <div className="flex gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-            <input type="text" placeholder="Search chart..." className="pl-9 pr-4 py-2 border rounded-xl focus:ring-2 outline-none" />
+            <input type="text" placeholder="Search chart..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 pr-4 py-2 border rounded-xl focus:ring-2 outline-none" />
           </div>
           <button onClick={() => setIsModalOpen(true)} className="btn-primary flex items-center gap-2"><Plus size={16}/> Sign New Note</button>
         </div>
@@ -83,7 +90,7 @@ export default function EMR() {
           <thead><tr className="bg-slate-50 text-[11px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-100">
             {['Note ID', 'Patient', 'Author', 'Document Type', 'Date', 'Status'].map(h => <th key={h} className="px-6 py-4">{h}</th>)}
           </tr></thead>
-          <tbody>{notes.map(n => (
+          <tbody>{filteredNotes.map(n => (
             <tr key={n.id} className="border-b border-slate-50 hover:bg-slate-50">
               <td className="px-6 py-4 font-mono text-xs font-bold text-slate-500">{n.id}</td>
               <td className="px-6 py-4 font-bold text-slate-800">{n.patient}</td>

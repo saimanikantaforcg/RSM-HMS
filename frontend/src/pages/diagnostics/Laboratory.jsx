@@ -15,6 +15,14 @@ export default function Laboratory() {
   const [resultForm, setResultForm] = useState({ resultValue: '', resultUnit: '', resultInterpretation: 'Normal', resultedBy: '' });
   const [formData, setFormData] = useState({ patient: '', mrn: '', test: 'Complete Blood Count (CBC)', priority: 'Routine' });
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredOrders = orders.filter(o =>
+    !searchTerm ||
+    o.patient?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    o.mrn?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    o.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    o.test?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const statusStyle = { 
     Resulted: 'bg-emerald-50 text-emerald-700 border-emerald-100', 
@@ -83,6 +91,8 @@ export default function Laboratory() {
             <input 
               type="text" 
               placeholder="Filter by MRN or Order ID..." 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500/50 outline-none w-64 transition-all"
             />
           </div>
@@ -141,7 +151,7 @@ export default function Laboratory() {
                 <tr><td colSpan={9} className="p-0 border-0"><SkeletonTable rows={5} cols={9}/></td></tr>
               ) : orders.length === 0 ? (
                 <tr><td colSpan={9} className="py-16 text-center text-slate-500">No orders found</td></tr>
-              ) : orders.map(t => (
+              ) : filteredOrders.map(t => (
                 <tr key={t.id} className="group transition-all">
                   <td className="font-bold text-purple-700 font-mono text-xs italic">{t.id}</td>
                   <td>

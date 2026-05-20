@@ -213,7 +213,7 @@ export default function Topbar() {
               </div>
               
               <div className="px-2">
-                <button className="w-full flex items-center gap-3 px-3 py-2 text-[13px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
+                <button onClick={() => { setShowUserMenu(false); navigate('/settings'); }} className="w-full flex items-center gap-3 px-3 py-2 text-[13px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">
                   <User size={16} className="text-slate-400" /> Profile
                 </button>
                 <button onClick={() => {setShowUserMenu(false); navigate('/settings');}} className="w-full flex items-center gap-3 px-3 py-2 text-[13px] font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors">

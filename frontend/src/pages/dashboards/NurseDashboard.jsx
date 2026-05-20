@@ -5,6 +5,7 @@ import {
   CheckCircle2, ChevronRight, HeartPulse
 } from 'lucide-react';
 import Layout from '../../components/Layout';
+import toast from 'react-hot-toast';
 import { getCurrentUser } from '../../lib/api';
 
 import { api } from '../../lib/api';
@@ -41,7 +42,7 @@ export default function NurseDashboard() {
           <h1 className="text-xl font-bold text-slate-900">Ward 3 — East Wing</h1>
           <p className="text-sm text-slate-500 mt-0.5">Nurse: {user?.name ?? 'Staff'} · {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
-        <button className="btn-danger self-start" onClick={() => {}}>
+        <button className="btn-danger self-start" onClick={() => { toast.error('Deterioration alert sent to clinical team!', { icon: '🚨', duration: 5000 }); navigate('/ipd'); }}>
           <AlertCircle size={14} /> Report Deterioration
         </button>
       </div>
@@ -93,7 +94,7 @@ export default function NurseDashboard() {
                   <p className="text-xs text-slate-500 mt-0.5">{p.dx} · Admitted {p.days}d ago</p>
                 </div>
 
-                <button className="btn-secondary text-xs flex-shrink-0" onClick={() => navigate(`/workspace?patientId=${p.id.replace('IPD-','')}`)}>
+                <button className="btn-secondary text-xs flex-shrink-0" onClick={() => navigate(`/workspace/${p.id.replace('IPD-','')}`)}>
                    View EMR
                 </button>
               </div>

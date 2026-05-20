@@ -13,6 +13,13 @@ export default function Pharmacy() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ patient: '', drug: 'Paracetamol 500mg', qty: '10 tabs' });
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredDispenses = dispenses.filter(d =>
+    !searchTerm ||
+    d.patient?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    d.drug?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    d.rx?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const fetchDispenses = async () => {
     try {
@@ -58,6 +65,8 @@ export default function Pharmacy() {
             <input 
               type="text" 
               placeholder="Search Rx Number..." 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-medium focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500/50 outline-none w-64 transition-all"
             />
           </div>
@@ -114,7 +123,7 @@ export default function Pharmacy() {
                 <tr><td colSpan={8} className="p-0 border-0"><SkeletonTable rows={5} cols={8}/></td></tr>
               ) : dispenses.length === 0 ? (
                 <tr><td colSpan={8} className="py-16 text-center text-slate-500">No records found</td></tr>
-              ) : dispenses.map(d => (
+              ) : filteredDispenses.map(d => (
                 <tr key={d.id} className="group transition-all">
                   <td className="font-bold text-slate-400 font-mono text-xs">{d.id}</td>
                   <td className="font-bold text-teal-700 font-mono text-xs uppercase tracking-tight">{d.rx}</td>
@@ -139,7 +148,7 @@ export default function Pharmacy() {
                     </span>
                   </td>
                   <td>
-                    <button className="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 transition-all">
+                    <button onClick={() => toast(`${d.drug} — ${d.patient} (${d.status})`, { icon: '💊' })} className="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-teal-600 hover:border-teal-200 hover:bg-teal-50 transition-all">
                       <ArrowRight size={14} />
                     </button>
                   </td>

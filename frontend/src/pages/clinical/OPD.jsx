@@ -93,7 +93,7 @@ export default function OPD() {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={() => toast('Schedule View coming soon!', { icon: '📅' })} 
+            onClick={() => navigate('/appointments')} 
             className="btn-secondary"
           >
             <Clock size={16} /> View Schedule
@@ -281,13 +281,13 @@ export default function OPD() {
             {/* Action Footer */}
             <div className="p-4 bg-slate-50 border-t border-slate-100 flex gap-3">
               <button 
-                onClick={() => toast.success(`Started consult for ${selectedPatient.name}`)}
+                onClick={() => selectedPatient?.patientId ? navigate(`/workspace/${selectedPatient.patientId}`) : navigate(`/workspace/${selectedPatient?.token || selectedPatient?.id}`)}
                 className="btn-primary flex-1 py-3 justify-center"
               >
                 <Stethoscope size={18} /> Start Consult
               </button>
               <button 
-                onClick={() => toast('Referral requested')}
+                onClick={() => { toast('Referral requested — redirecting to ADT', { icon: '🔄' }); navigate('/adt'); }}
                 className="btn-secondary py-3 px-4" title="Refer/Transfer"
               >
                 <ArrowRightLeft size={18} />

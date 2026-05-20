@@ -18,6 +18,18 @@ export default function Billing() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [patientName, setPatientName] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
+  const [invoiceSearch, setInvoiceSearch] = useState('');
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const filteredInvoices = invoices.filter(i =>
+    !invoiceSearch ||
+    i.patient?.toLowerCase().includes(invoiceSearch.toLowerCase()) ||
+    i.id?.toLowerCase().includes(invoiceSearch.toLowerCase())
+  );
+  const filteredCatalog = catalog.filter(s =>
+    !catalogSearch ||
+    s.name?.toLowerCase().includes(catalogSearch.toLowerCase()) ||
+    s.category?.toLowerCase().includes(catalogSearch.toLowerCase())
+  );
   
   // Cart state
   const [cart, setCart] = useState([]);
@@ -173,6 +185,8 @@ export default function Billing() {
             <input 
               type="text" 
               placeholder="Search Invoice ID or Patient..." 
+              value={invoiceSearch}
+              onChange={e => setInvoiceSearch(e.target.value)}
               className="input pl-10 !py-2 !text-sm"
             />
           </div>
@@ -203,7 +217,7 @@ export default function Billing() {
                     </div>
                   </td>
                 </tr>
-              ) : invoices.map(i => (
+              ) : filteredInvoices.map(i => (
                 <tr key={i.id} className="hover:bg-slate-50 transition-colors cursor-pointer">
                   <td><span className="font-mono text-sm font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded shadow-sm">{i.id}</span></td>
                   <td>
@@ -260,7 +274,7 @@ export default function Billing() {
                   <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Service Catalog</h3>
                   <div className="relative mb-6">
                     <Search className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
-                    <input type="text" placeholder="Search procedures, labs, consults..." className="input pl-11 !py-3 bg-white shadow-sm" />
+                    <input type="text" placeholder="Search procedures, labs, consults..." value={catalogSearch} onChange={e => setCatalogSearch(e.target.value)} className="input pl-11 !py-3 bg-white shadow-sm" />
                   </div>
                 </div>
 
@@ -268,7 +282,7 @@ export default function Billing() {
                   {catalog.length === 0 && (
                     <p className="col-span-2 text-sm text-slate-400 text-center py-4">Loading catalog…</p>
                   )}
-                  {catalog.map(serv => (
+                  {filteredCatalog.map(serv => (
                     <div 
                       key={serv.id} 
                       onClick={() => addToCart({ id: serv.id, name: serv.name, price: Number(serv.unitPrice) })}
