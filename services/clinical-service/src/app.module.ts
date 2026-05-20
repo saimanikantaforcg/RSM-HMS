@@ -1,6 +1,8 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -112,6 +114,15 @@ import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
+    // ─── Static Frontend Serving (single-container / HF Spaces) ─────────
+    ...(process.env.SERVE_STATIC === 'true' ? [
+      ServeStaticModule.forRoot({
+        rootPath: process.env.FRONTEND_DIST_PATH || join(__dirname, '..', 'frontend', 'dist'),
+        exclude: ['/api/(.*)'],
+        serveStaticOptions: { index: false },
+      }),
+    ] : []),
+
     // ─── Phase 2: Observability (Prometheus + Sentry) ─────────────────────
     PrometheusModule.register({
       path: '/metrics',

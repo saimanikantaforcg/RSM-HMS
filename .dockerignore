@@ -1,0 +1,57 @@
+# Dependencies — never include in image
+node_modules/
+**/node_modules/
+
+# Build outputs (rebuilt in Docker stages)
+dist/
+**/dist/
+build/
+frontend/build/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+services/**/.env
+services/**/.env.*
+
+# Database files
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+hms_db
+hms_db_test
+services/clinical-service/hms_db
+services/clinical-service/hms_db_test
+
+# Logs
+*.log
+logs/
+services/clinical-service/logs/
+services/clinical-service/backend_log.txt
+frontend/build_err.txt
+frontend/build_out.txt
+frontend/lint_out.txt
+
+# Test artefacts
+coverage/
+e2e-output.json
+e2e-final.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# Kubernetes / CI (not needed in runtime image)
+k8s/
+.github/
+
+# Docs
+*.md

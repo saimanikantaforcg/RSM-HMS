@@ -44,7 +44,8 @@ async function bootstrap() {
     : ['http://localhost:5173'];
 
   app.enableCors({
-    origin: allowedOrigins,
+    // 'true' echoes request Origin — required when credentials + wildcard
+    origin: allowedOrigins.includes('*') ? true : allowedOrigins,
     credentials: true,    // Required for cookies to be sent cross-origin
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-csrf-token'],
