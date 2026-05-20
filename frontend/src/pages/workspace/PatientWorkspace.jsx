@@ -158,12 +158,11 @@ export default function PatientWorkspace() {
       const payload = {
         patientId: id || patient.mrn,
         patientName: patient.name,
-        soap: note,
         content: JSON.stringify(note),
         orders: selectedOrders,
         prescriptions: selectedRx,
-        author: 'Dr. Sarah Jenkins', // In prod, get from context
-        type: 'Encounter Note'
+        author: 'Dr. Sarah Jenkins',
+        type: 'Progress Note',
       };
 
       const res = await api.post('/emr/sign', payload);
