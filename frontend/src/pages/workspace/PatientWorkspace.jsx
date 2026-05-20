@@ -268,16 +268,27 @@ export default function PatientWorkspace() {
               <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Longitudinal Timeline</p>
             </div>
             <div className="p-2 space-y-1">
-              {history.length > 0 ? history.map((h, i) => (
+              {history.length > 0 ? history.map((h, i) => {
+                // Parse SOAP JSON content into a readable preview
+                let preview = 'Progress Note';
+                try {
+                  const soap = typeof h.content === 'string' ? JSON.parse(h.content) : h.content;
+                  const text = soap?.assessment || soap?.subjective || soap?.plan || soap?.objective || '';
+                  preview = text.trim() ? text.trim().substring(0, 60) : 'No details recorded';
+                } catch {
+                  preview = (h.content || 'Progress Note').substring(0, 60);
+                }
+                return (
                 <div key={i} className="hover:bg-slate-50 p-3 rounded-xl transition-colors cursor-pointer group">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded">{h.type}</span>
                     <span className="text-[10px] font-bold text-slate-400 uppercase">{h.date}</span>
                   </div>
-                  <p className="text-xs font-bold text-slate-800 group-hover:text-teal-700 transition-colors truncate">{h.content?.substring(0, 50) || 'Progress Note'}</p>
+                  <p className="text-xs font-bold text-slate-800 group-hover:text-teal-700 transition-colors truncate">{preview}</p>
                   <p className="text-[10px] text-slate-400 mt-1 font-medium">{h.author}</p>
                 </div>
-              )) : (
+                );
+              }) : (
                 <p className="text-[10px] text-slate-400 text-center py-4">No history records found</p>
               )}
             </div>
